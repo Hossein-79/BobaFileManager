@@ -1,6 +1,10 @@
+using BobaFileManager.Data;
+using BobaFileManager.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,7 +27,24 @@ namespace BobaFileManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<BobaContext>(options =>
+            {
+                var connectionString = Configuration.GetConnectionString("BobaContext");
+                options.UseSqlite(connectionString);
+            });
+
             services.AddControllersWithViews();
+
+            services.AddAuthorization();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+            {
+                option.Cookie.Name = "xid";
+                option.AccessDeniedPath = "/index";
+                option.LoginPath = "/index";
+            });
+
+            services.AddTransient<INetherumService, NetherumService>();
+            services.AddTransient<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,10 +65,15 @@ namespace BobaFileManager
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                    name: "root",
+                    defaults: new { controller = "Home", action = "Index" },
+                    pattern: "{action}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

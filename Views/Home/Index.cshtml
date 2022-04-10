@@ -6,3 +6,37 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+@section Scripts
+{
+    <script src="~/web3/web3.min.js"></script>
+
+    <script>
+        window.userWalletAddress = null
+        if (typeof window.ethereum !== 'undefined') {
+            console.log('MetaMask is installed!');
+        } else {
+            console.log("not instaled");
+        }
+        loginWithMetaMask()
+
+        async function loginWithMetaMask() {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+                .catch((e) => {
+                    console.error(e.message)
+                    return
+                })
+            if (!accounts) { return }
+
+            window.userWalletAddress = accounts[0]
+
+            const account = accounts[0];
+            console.log(accounts);
+
+            const web3 = new window.Web3(window.ethereum);
+            const message = "Login with " + window.userWalletAddress;
+            const signature = await web3.eth.personal.sign(message, window.userWalletAddress)
+            console.log(signature);
+        }
+    </script>
+}
