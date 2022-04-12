@@ -44,9 +44,9 @@
     </label>
     <form action="" class="flex-grow">
         <div class="input-wrapper group m-0">
-            <input type="text" class="input" placeholder="Or write here to upload as .txt">
+            <input type="text" class="input pr-20" placeholder="Or write here to upload as .txt">
             <div class="input-icon invisible group-focus-within:visible">
-                <button class="btn btn-sm">send</button>
+                <button class="btn btn-sm" type="submit">send</button>
             </div>
         </div>
     </form>
@@ -54,6 +54,33 @@
         <input type="file" name="file" id="file-input" class="hidden">
     </form>
 </footer>
+@* MODALS *@
+<div class="modal" id="file-preview-modal">
+    <div class="modal-body">
+        <div class="modal-header">
+            <h2>Upload Confirm</h2>
+            <button type="button" class="btn-icon modal-close">
+                <svg role="img" class="h-5 w-5">
+                    <use xlink:href="/img/sprite.svg#icon-x"></use>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-content"></div>
+        <form action="" id="file-submit-form" class="flex flex-col mt-4">
+            <p class="text-sm text-gray-600 mb-4">
+                Uploading this file will cost you <strong class="font-medium"><span id="file-size"></span> Boba</strong>.
+            </p>
+            <button type="submit" id="upload-confirm-btn" class="btn mt-2">
+                <div class="loader">
+                    <svg role="img" class="animate-spin w-6 h-6">
+                        <use xlink:href="/img/sprite.svg#icon-loader"></use>
+                    </svg>
+                </div>
+                <span class="text">Upload File</span>
+            </button>
+        </form>
+    </div>
+</div>
 
 @section Scripts {
 <script src="~/web3/web3.min.js"></script>
@@ -108,12 +135,17 @@
         $.get('/GetFee?length=' + file.size)
             .done(function(response) {
                 console.log(response)
+                $('#file-size').text(response);
+                showModal($('#file-preview-modal'));
             })
             .fail(function(error) {
                 showAlert(error, 'error');
-            })
-        console.log(file.size)
-        @* $('#upload-form').submit(); *@
+            });
+    });
+    $(document).on('click', '#upload-confirm-btn', function() {
+        var btn = $(this);
+        btn.attr('disabled', 'disabled').addClass('loading');
+        $('#upload-form').submit();
     });
     $(document).on('submit', '#upload-form', function (e) {
         e.preventDefault();

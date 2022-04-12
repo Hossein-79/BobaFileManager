@@ -15,10 +15,10 @@
         @apply relative mb-2;
     }
     .input-wrapper .input {
-        @apply pr-10 m-0;
+        @apply pr-16 m-0;
     }
     .input-wrapper .input-icon {
-        @apply absolute inset-y-0 right-2 flex items-center pointer-events-none text-gray-300;
+        @apply absolute inset-y-0 right-2 flex items-center text-gray-300;
     }
     .input-wrapper:focus-within .input-icon {
         @apply text-blue-500;
@@ -51,7 +51,7 @@
         @apply flex justify-center items-center;
     }
     .btn.btn-sm {
-        @apply text-sm px-3 py-2;
+        @apply text-sm px-2 py-2;
     }
     .btn-icon {
         @apply relative bg-transparent rounded-full transition-colors p-2;
