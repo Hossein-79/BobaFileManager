@@ -15,5 +15,6 @@ namespace BobaFileManager.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<UserFile> UserFiles { get; set; }
     }
 }

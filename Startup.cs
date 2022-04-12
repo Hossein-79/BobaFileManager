@@ -45,6 +45,8 @@ namespace BobaFileManager
 
             services.AddTransient<INetherumService, NetherumService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IBundlrService, BundlrService>();
+            services.AddTransient<IUserFileService, UserFileService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
