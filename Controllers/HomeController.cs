@@ -115,7 +115,7 @@ namespace BobaFileManager.Controllers
             user.Balance -= fee;
             await _userService.Update(user);
 
-            return Json(fileInfo.ArweaveUrl);
+            return PartialView("_UserFilePartial", fileInfo);
         }
 
         public IActionResult GetFee(long length)
