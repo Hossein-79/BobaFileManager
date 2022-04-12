@@ -1,0 +1,149 @@
+﻿@model IEnumerable<UserFile> 
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<header class="flex items-center bg-white shadow p-3">
+    <img src="https://source.boringavatars.com/marble/120/0x05E4193Db127fC3Ed080B85c37e0F4eC8fCAd8fD?colors=264653,2a9d8f,e9c46a,f4a261,e76f51"
+        class="w-10 h-10 mr-3" alt="">
+    <a href="#" class="flex flex-col">
+        <span class="text-sm font-bold mb-1">0x05E4...d8fD</span>
+        <small class="text-xs font-light text-slate-500">Disconnect</small>
+    </a>
+    <button type="button" class="flex flex-col items-end cursor-pointer ml-auto" id="add-funds-btn">
+        <span class="text-sm font-medium mb-1">@(ViewBag.Balance) Boba</span>
+        <small class="text-xs font-light text-emerald-600">Add Funds</small>
+    </button>
+</header>
+<section class="flex flex-col flex-grow bg-slate-100">
+    @if(Model.Any())
+    {
+        foreach (var file in Model)
+        {
+            @await Html.PartialAsync("~/Views/Shared/_UserFilePartial.cshtml", file);
+        }
+    }
+    else
+    {
+        <div class="empty-state flex flex-col items-center text-center m-auto max-w-min">
+            <svg role="img" class="h-64 w-64 mx-5">
+                <use xlink:href="/img/sprite.svg#illustration-empty"></use>
+            </svg>
+            <h2 class="font-medium text-lg mb-2">This place looks empty!</h2>
+            <span class="font-light text-sm text-slate-500">Upload a file or send a message and have it stored as a .txt
+                file</span>
+        </div>
+    }
+    <progress></progress>
+</section>
+<footer class="flex bg-white shadow p-3">
+    <label for="file-input" class="btn cursor-pointer mr-3">
+        <svg role="img" class="h-6 w-6">
+            <use xlink:href="/img/sprite.svg#icon-upload-cloud"></use>
+        </svg>
+    </label>
+    <form action="" class="flex-grow">
+        <div class="input-wrapper group m-0">
+            <input type="text" class="input" placeholder="Or write here to upload as .txt">
+            <div class="input-icon invisible group-focus-within:visible">
+                <button class="btn btn-sm">send</button>
+            </div>
+        </div>
+    </form>
+    <form action="" enctype="multipart/form-data" id="upload-form">
+        <input type="file" name="file" id="file-input" class="hidden">
+    </form>
+</footer>
+
+@section Scripts {
+<script src="~/web3/web3.min.js"></script>
+<script>
+    const web3 = new window.Web3(window.ethereum);
+    $(document).on('click', '#add-funds-btn', function () {
+        const abi = [{
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "_to",
+                    "type": "address"
+                },
+                {
+                    "name": "_value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "transfer",
+            "outputs": [
+                {
+                    "name": "success",
+                    "type": "bool"
+                }
+            ],
+            "payable": false,
+            "type": "function"
+        }];
+        const contract_address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309';
+        const addr = ethereum.selectedAddress;
+        const amount = web3.utils.toWei('0.1', 'ether');
+        const contract = new web3.eth.Contract(abi, contract_address).methods.transfer(addr, amount).send({
+            from: addr,
+            value: web3.utils.toWei('0', 'ether')
+        })
+            .then(function (receipt) {
+                console.log(receipt);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    })
+
+    $(document).on('change', ':file', function () {
+        var input = $(this);
+        var file = this.files[0];
+        if (file.size > 20000000) {
+            input.val('');
+            showAlert('File size is too big', 'error');
+            return;
+        }
+        $.get('/GetFee?length=' + file.size)
+            .done(function(response) {
+                console.log(response)
+            })
+            .fail(function(error) {
+                showAlert(error, 'error');
+            })
+        console.log(file.size)
+        @* $('#upload-form').submit(); *@
+    });
+    $(document).on('submit', '#upload-form', function (e) {
+        e.preventDefault();
+        var form = $(this);
+        $.ajax({
+            url: 'https://localhost:5001/upload',
+            type: 'POST',
+            data: new FormData(form[0]),
+            cache: false,
+            contentType: false,
+            processData: false,
+            xhr: function () {
+                var myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) {
+                    myXhr.upload.addEventListener('progress', function (e) {
+                        if (e.lengthComputable) {
+                            $('progress').attr({
+                                value: e.loaded,
+                                max: e.total,
+                            });
+                        }
+                    }, false);
+                }
+                return myXhr;
+            }
+        })
+    });
+
+    function showAlert(message, type) {
+        alert(message);
+    }
+</script>
+}
