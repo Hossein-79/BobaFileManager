@@ -42,9 +42,9 @@
             <use xlink:href="/img/sprite.svg#icon-upload-cloud"></use>
         </svg>
     </label>
-    <form action="" class="flex-grow">
+    <form action="" class="flex-grow" id="text-upload">
         <div class="input-wrapper group m-0">
-            <input type="text" class="input pr-20" placeholder="Or write here to upload as .txt">
+            <input type="text" id="text-input" class="input pr-20" placeholder="Or write here to upload as .txt">
             <div class="input-icon invisible group-focus-within:visible">
                 <button class="btn btn-sm" type="submit">send</button>
             </div>
@@ -142,8 +142,9 @@
                 showAlert(error, 'error');
             });
     });
-    $(document).on('click', '#upload-confirm-btn', function() {
-        var btn = $(this);
+    $(document).on('submit', '#file-submit-form', function(e) {
+        e.preventDefault();
+        var btn = $('#upload-confirm-btn');
         btn.attr('disabled', 'disabled').addClass('loading');
         $('#upload-form').submit();
     });
@@ -172,6 +173,12 @@
                 return myXhr;
             }
         })
+    });
+
+    $(document).on('submit', '#text-upload', function(e) {
+        e.preventDefault();
+        var inputVal = $('#text-input').val();
+        var fileName = 
     });
 
     function showAlert(message, type) {
