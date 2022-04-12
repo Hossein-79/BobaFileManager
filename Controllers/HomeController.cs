@@ -104,6 +104,10 @@ namespace BobaFileManager.Controllers
             };
             await _userFileService.Add(fileInfo);
 
+            fileInfo.ArweaveUrl = "https://arweave.net/4mcsgP3kVbT-0I4UEhwmE6F3OJ2wNryhWYHWQP5-Z2w";
+            fileInfo.IsUploaded = true;
+            return PartialView("_UserFilePartial", fileInfo);
+
             var arweaveUrl = _bundlrService.UploadFile(path);
             if (arweaveUrl is null)
                 return Json(new { Success = false, Msg = "upload to blockchain exeption" });
@@ -120,8 +124,8 @@ namespace BobaFileManager.Controllers
 
         public IActionResult GetFee(long length)
         {
-            var fee = _bundlrService.GetUploadFee(length);
-
+            //var fee = _bundlrService.GetUploadFee(length);
+            var fee = 0.000089631437673069m;
             return Json(fee);
         }
 
