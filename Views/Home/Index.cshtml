@@ -2,41 +2,166 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (User.Identity.IsAuthenticated)
+{
+    <h1>Hello, user</h1>
+    <form enctype="multipart/form-data" id="upload-form">
+        <input name="file" type="file" />
+        <button type="submit">Upload</button>
+    </form>
+    <progress></progress>
+}
+else
+{
+    @* NO METAMASK *@
+    <section id="no-metamask" class="text-left border-l-4 border-orange-400 pl-3 py-1 m-auto hidden">
+        <h1 class="text-2xl font-medium mb-2">Please install MetaMask</h1>
+        <p class="text-sm">
+            <a href="https://metamask.io/" target="_blank" class="text-sky-600 hover:text-sky-700 active:text-sky-800 active:underline">
+                Download MetaMask
+            </a>
+        </p>
+    </section>
+    @* SAFARI OR IPHONE *@
+    <section id="invalid-browser" class="text-left border-l-4 border-rose-400 pl-3 py-1 m-auto hidden">
+        <h1 class="text-2xl font-medium mb-2">Please use another browser!</h1>
+        <p class="text-sm text-slate-500">
+            Safari (and any other browser on iPhone) does not currently support MetaMask which is required for this web application to work.
+        </p>
+    </section>
+    @* VALID *@
+    <section id="valid" class="mt-auto mx-10 mb-10 hidden">
+        <svg role="img" class="h-72 w-full mx-auto mb-5">
+            <use xlink:href="/img/sprite.svg#illustration-rocket"></use>
+        </svg>
+        <div>
+            <h1 class="text-2xl font-bold">
+                Store all your files above clouds
+            </h1>
+            <p class="font-light text-slate-600 dark:text-slate-400 my-5">
+                Connect your wallet and receive some free Boba to get you started uploading on the Arweave blockchain
+            </p>
+            <button id="add-wallet-btn" class="btn w-full bg-orange-400 hover:bg-orange-500 active:bg-orange-600">Connect to MetaMask</button>
+        </div>
+    </section>
+}
 
 @section Scripts
 {
     <script src="~/web3/web3.min.js"></script>
 
     <script>
-        window.userWalletAddress = null
-        if (typeof window.ethereum !== 'undefined') {
-            console.log('MetaMask is installed!');
-        } else {
-            console.log("not instaled");
+        @if (User.Identity.IsAuthenticated)
+        {
+            <text>
+                $(document).on('change', ':file', function() {
+                    var file = this.files[0];
+                    if (file.size > 10485760) {
+                        alert('File size is too big');
+                        return;
+                    }
+                });
+                $(document).on('submit', '#upload-form', function(e) {
+                    e.preventDefault();
+                    var form = $(this);
+                    $.ajax({
+                        url: 'https://localhost:5001/api/upload',
+                        type: 'POST',
+                        data: new FormData(form[0]),
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        xhr: function () {
+                            var myXhr = $.ajaxSettings.xhr();
+                            if (myXhr.upload) {
+                                myXhr.upload.addEventListener('progress', function (e) {
+                                    if (e.lengthComputable) {
+                                        $('progress').attr({
+                                            value: e.loaded,
+                                            max: e.total,
+                                        });
+                                    }
+                                }, false);
+                            }
+                            return myXhr;
+                        }
+                    })
+                });
+            </text>
         }
-        loginWithMetaMask()
+        else
+        {
+            <text>
+                window.userWalletAddress = null
+                if (typeof window.ethereum !== 'undefined') {
+                    console.log('MetaMask is installed!');
+                    $('#valid').removeClass('hidden');
+                    $(document).on('click', '#add-wallet-btn', function () {
+                        // Check if MetaMask is pointing to the right network
+                        if (ethereum.networkVersion !== '28') {
+                            window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x1c',
+                                    chainName: 'Boba Rinkeby Testnet',
+                                    nativeCurrency: {
+                                        name: 'Ethereum',
+                                        symbol: 'ETH',
+                                        decimals: 18
+                                    },
+                                    rpcUrls: ['https://rinkeby.boba.network/'],
+                                    blockExplorerUrls: ['https://blockexplorer.rinkeby.boba.network/']
+                                }]
+                            })
+                            .then(function (result) {
+                                loginWithMetaMask();
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                        } else {
+                            loginWithMetaMask();
+                        }
+                    });
+                } else {
+                    console.log("MetaMask not instaled!");
+                    // Check if user is on safari or using an iphone
+                    if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+                        $('#invalid-browser').removeClass('hidden');
+                    } else {
+                        $('#no-metamask').removeClass('hidden');
+                    }
+                }
+                @* loginWithMetaMask() *@
 
-        async function loginWithMetaMask() {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-                .catch((e) => {
-                    console.error(e.message)
-                    return
-                })
-            if (!accounts) { return }
+                async function loginWithMetaMask() {
+                        
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+                        .catch((e) => {
+                            console.error(e.message)
+                            return
+                        })
+                    if (!accounts) { return }
 
-            window.userWalletAddress = accounts[0]
+                    window.userWalletAddress = accounts[0]
 
-            const account = accounts[0];
-            console.log(accounts);
+                    const account = accounts[0];
+                    console.log(accounts);
 
-            const web3 = new window.Web3(window.ethereum);
-            const message = "Login with " + window.userWalletAddress;
-            const signature = await web3.eth.personal.sign(message, window.userWalletAddress)
-            console.log(signature);
+                    const web3 = new window.Web3(window.ethereum);
+                    const message = "Login with " + window.userWalletAddress;
+                    const signature = await web3.eth.personal.sign(message, window.userWalletAddress)
+                    console.log(signature);
+                    $.get('/login', {
+                        address: window.userWalletAddress,
+                        signature: signature
+                    })
+                    .done(function (data) {
+                        console.log(data);
+                        window.location.href = '/';
+                    })
+                }
+            </text>
         }
     </script>
 }
