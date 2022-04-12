@@ -39,12 +39,17 @@ namespace BobaFileManager.Controllers
             _hostEnvironment = environment;
         }
 
-        public IActionResult Index(string text)
+        public async Task<IActionResult> Index(string text)
         {
-            //var fee = _bundlrService.GetUploadFee(5000);
-            //var fileUrl = _bundlrService.UploadFile("D:\\Projects\\BobaFileManager\\libman.json");
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userService.GetUser(User.Identity.Name);
+                var files = await _userFileService.GetUserFiles(user.UserId);
 
+                ViewBag.Balance = user.Balance;
 
+                return View("Dashboard", files);
+            }
             return View();
         }
 
@@ -122,6 +127,9 @@ namespace BobaFileManager.Controllers
 
         public async Task<IActionResult> Login(string address, string signature)
         {
+            if (User.Identity.IsAuthenticated)
+                return Json(true);
+
             var massage = "Login with " + address;
             var publicAddress = _netherumService.VerifySignature(massage, address, signature);
 

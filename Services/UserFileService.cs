@@ -1,5 +1,6 @@
 ﻿using BobaFileManager.Data;
 using BobaFileManager.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace BobaFileManager.Services
         {
             _context = paperContext;
         }
+
+        public async Task<IEnumerable<UserFile>> GetUserFiles(int userId) =>
+            await _context.UserFiles.Where(u => u.UserId == userId).ToListAsync();
 
         public async Task Add(UserFile file)
         {
