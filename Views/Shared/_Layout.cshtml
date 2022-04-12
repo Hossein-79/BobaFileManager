@@ -6,15 +6,8 @@
     <title>@ViewData["Title"] - BobaFileManager</title>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
-<body class="flex flex-col min-h-screen text-slate-900 dark:bg-gray-900 dark:text-white @(User.Identity.IsAuthenticated ? "bg-gray-100" : "bg-slate-200")">
-    @* <header class="p-3 mb-3">
-        <a href="/" class="inline-block align-sub">
-            <svg role="img" class="h-8 w-36">
-                <use xlink:href="/img/sprite.svg#logotype"></use>
-            </svg>
-        </a>
-    </header> *@
-    <div class="container flex flex-col flex-grow mx-auto">
+<body class="flex flex-col min-h-screen bg-slate-200 text-slate-900">
+    <div class="flex flex-col flex-grow mx-auto w-full">
         <main role="main" class="flex flex-col flex-grow">
             @RenderBody()
         </main>

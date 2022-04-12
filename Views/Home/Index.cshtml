@@ -1,47 +1,85 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
 @if (User.Identity.IsAuthenticated)
 {
-    <h1>Hello, user</h1>
-    <form enctype="multipart/form-data" id="upload-form">
-        <input name="file" type="file" />
-        <button type="submit">Upload</button>
-    </form>
-    <progress></progress>
+    <header class="flex items-center bg-white shadow p-3">
+        <img src="https://source.boringavatars.com/marble/120/0x05E4193Db127fC3Ed080B85c37e0F4eC8fCAd8fD?colors=264653,2a9d8f,e9c46a,f4a261,e76f51" class="w-10 h-10 mr-3" alt="">
+        <a href="#" class="flex flex-col">
+            <span class="text-sm font-bold mb-1">0x05E4...d8fD</span>
+            <small class="text-xs font-light text-slate-500">Disconnect</small>
+        </a>
+        <button type="button" class="flex flex-col items-end cursor-pointer ml-auto" id="add-funds-btn">
+            <span class="text-sm font-medium mb-1">0.1 Boba</span>
+            <small class="text-xs font-light text-emerald-600">Add Funds</small>
+        </button>
+    </header>
+    <section class="flex flex-col flex-grow bg-slate-100">
+        <div class="empty-state flex flex-col items-center text-center m-auto max-w-min">
+            <svg role="img" class="h-64 w-64 mx-5">
+                <use xlink:href="/img/sprite.svg#illustration-empty"></use>
+            </svg>
+            <h2 class="font-medium text-lg mb-2">This place looks empty!</h2>
+            <span class="font-light text-sm text-slate-500">Upload a file or send a message and have it stored as a .txt file</span>
+        </div>
+        <h1>Hello, user</h1>
+        <form enctype="multipart/form-data" id="upload-form">
+            <input name="file" type="file" />
+            <button type="submit">Upload</button>
+        </form>
+        <progress></progress>
+    </section>
+    <footer class="flex bg-white shadow p-3">
+        <label class="btn cursor-pointer mr-3">
+            <svg role="img" class="h-6 w-6">
+                <use xlink:href="/img/sprite.svg#icon-upload-cloud"></use>
+            </svg>
+            <input type="file" name="" id="" class="hidden">
+        </label>
+        <form action="" class="flex-grow">
+            <div class="input-wrapper group m-0">
+                <input type="text" class="input" placeholder="Or write here to upload as .txt">
+                <div class="input-icon invisible group-focus-within:visible">
+                    <button>send</button>
+                </div>
+            </div>
+        </form>
+    </footer>
 }
 else
 {
-    @* NO METAMASK *@
-    <section id="no-metamask" class="text-left border-l-4 border-orange-400 pl-3 py-1 m-auto hidden">
-        <h1 class="text-2xl font-medium mb-2">Please install MetaMask</h1>
-        <p class="text-sm">
-            <a href="https://metamask.io/" target="_blank" class="text-sky-600 hover:text-sky-700 active:text-sky-800 active:underline">
-                Download MetaMask
-            </a>
-        </p>
-    </section>
-    @* SAFARI OR IPHONE *@
-    <section id="invalid-browser" class="text-left border-l-4 border-rose-400 pl-3 py-1 m-auto hidden">
-        <h1 class="text-2xl font-medium mb-2">Please use another browser!</h1>
-        <p class="text-sm text-slate-500">
-            Safari (and any other browser on iPhone) does not currently support MetaMask which is required for this web application to work.
-        </p>
-    </section>
-    @* VALID *@
-    <section id="valid" class="mt-auto mx-10 mb-10 hidden">
-        <svg role="img" class="h-72 w-full mx-auto mb-5">
+    <section class="flex flex-col lg:flex-row lg:w-2/3 mt-auto lg:m-auto lg:items-center mx-10 mb-10">
+        <svg role="img" class="h-72 w-full lg:w-80 mx-auto mb-5 lg:mb-0 lg:ml-0 lg:mr-24">
             <use xlink:href="/img/sprite.svg#illustration-rocket"></use>
         </svg>
         <div>
             <h1 class="text-2xl font-bold">
                 Store all your files above clouds
             </h1>
-            <p class="font-light text-slate-600 dark:text-slate-400 my-5">
+            <p class="font-light text-slate-600 my-5">
                 Connect your wallet and receive some free Boba to get you started uploading on the Arweave blockchain
             </p>
-            <button id="add-wallet-btn" class="btn w-full bg-orange-400 hover:bg-orange-500 active:bg-orange-600">Connect to MetaMask</button>
+            @* VALID BROWSER, WITH METAMASK *@
+            <div id="valid" class="hidden">
+                <button type="button" id="add-wallet-btn" class="btn w-full lg:w-max bg-orange-400 hover:bg-orange-500 active:bg-orange-600">Connect to MetaMask</button>
+            </div>
+            @* SAFARI OR IPHONE *@
+            <div id="invalid-browser" class="text-left border-l-4 border-rose-400 pl-3 py-1">
+                <h1 class="text-2xl font-medium mb-2">Please use another browser!</h1>
+                <p class="text-sm text-slate-500">
+                    Safari (and any other browser on iPhone) does not currently support MetaMask which is required for this web application to work.
+                </p>
+            </div>
+            @* NO METAMASK *@
+            <div id="no-metamask" class="text-left border-l-4 border-orange-400 pl-3 py-1 hidden">
+                <h1 class="text-2xl font-medium mb-2">Please install MetaMask</h1>
+                <p class="text-sm">
+                    <a href="https://metamask.io/" target="_blank" class="text-sky-600 hover:text-sky-700 active:text-sky-800 active:underline">
+                        Download MetaMask
+                    </a>
+                </p>
+            </div>
         </div>
     </section>
 }
@@ -51,9 +89,67 @@ else
     <script src="~/web3/web3.min.js"></script>
 
     <script>
+        const web3Client = new Web3("https://rinkeby.boba.network");
+        $(document).on('click', '#add-funds-btn', function() {
+            // abi-encode transfer function
+            const abi = [{
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_to",
+                        "type": "address"
+                    },
+                    {
+                        "name": "_value",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "transfer",
+                "outputs": [
+                    {
+                        "name": "success",
+                        "type": "bool"
+                    }
+                ],
+                "payable": false,
+                "type": "function"
+            }];
+            const contract_address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309';
+            const addr = ethereum.selectedAddress;
+            const amount = '0.2';
+            const eth = new web3.Eth(web3.currentProvider);
+            const token = eth.contract(abi).at(contract_address);
+            token.transfer(addr, amount, {
+                from: addr,
+                gas: 3000000
+            }, function(err, result) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log(result);
+                }
+            });
+
+            @* const encodedFunction = web3Client.eth.abi.encodeFunctionCall('transfer(address,uint256)', ['0x05E4193Db127fC3Ed080B85c37e0F4eC8fCAd8fD', 10000000000000000]);
+            const encodedAddress = web3Client.eth.abi.encodeParameter('address', '0x05E4193Db127fC3Ed080B85c37e0F4eC8fCAd8fD');
+            const encodedValue = web3Client.eth.abi.encodeParameter('uint256', '1000000000000000000');
+            console.log(encodedFunction, encodedAddress, encodedValue);
+            const transactionParameters = {
+                nonce: '0x00',
+                gasPrice: '0x09184e72a000',
+                gas: '0x2710',
+                to: '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309',
+                from: ethereum.selectedAddress, // must match user's active address.
+                value: '0x00',
+                data:
+                    '0x7f7465737432000000000000000000000000000000000000000000000000000000600057', // Optional, but used for defining smart contract creation and interaction.
+                chainId: '0x1c',
+            }; *@
+        })
         @if (User.Identity.IsAuthenticated)
         {
             <text>
+                console.log(web3)
                 $(document).on('change', ':file', function() {
                     var file = this.files[0];
                     if (file.size > 10485760) {
@@ -94,8 +190,7 @@ else
             <text>
                 window.userWalletAddress = null
                 if (typeof window.ethereum !== 'undefined') {
-                    console.log('MetaMask is installed!');
-                    $('#valid').removeClass('hidden');
+                    $('#valid').removeClass('hidden').addClass('flex');
                     $(document).on('click', '#add-wallet-btn', function () {
                         // Check if MetaMask is pointing to the right network
                         if (ethereum.networkVersion !== '28') {
