@@ -10,5 +10,9 @@ namespace BobaFileManager.Models
         public int UserId { get; set; }
 
         public string Address { get; set; }
+
+        public decimal Balance { get; set; }
+
+        public IEnumerable<UserFile> UserFiles { get; set; }
     }
 }

@@ -8,5 +8,6 @@ namespace BobaFileManager.Services
         Task<User> GetUser(int useId);
         Task<User> GetUser(string address);
         Task TryAdd(User user);
+        Task Update(User user);
     }
 }

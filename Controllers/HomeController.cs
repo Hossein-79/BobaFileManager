@@ -1,12 +1,17 @@
-﻿using BobaFileManager.Models;
+﻿using BobaFileManager.Helpers;
+using BobaFileManager.Models;
 using BobaFileManager.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -18,17 +23,101 @@ namespace BobaFileManager.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly INetherumService _netherumService;
         private readonly IUserService _userService;
+        private readonly IBundlrService _bundlrService;
+        private readonly IUserFileService _userFileService;
 
-        public HomeController(ILogger<HomeController> logger, INetherumService netherumService, IUserService userService)
+        private readonly IWebHostEnvironment _hostEnvironment;
+
+        public HomeController(ILogger<HomeController> logger, IUserFileService userFileService, IWebHostEnvironment environment, INetherumService netherumService, IUserService userService, IBundlrService bundlrService)
         {
             _logger = logger;
             _netherumService = netherumService;
             _userService = userService;
+            _bundlrService = bundlrService;
+            _userFileService = userFileService;
+
+            _hostEnvironment = environment;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string text)
         {
+            //var fee = _bundlrService.GetUploadFee(5000);
+            //var fileUrl = _bundlrService.UploadFile("D:\\Projects\\BobaFileManager\\libman.json");
+
+
             return View();
+        }
+
+        //[Authorize]
+        //public async Task<IActionResult> UploadText(string text)
+        //{
+        //    var user = await _userService.GetUser(User.Identity.Name);
+
+
+        //    //System.IO.File.WriteAllText(path, text);
+        //    long length = new System.IO.FileInfo(path).Length;
+
+        //    var fee = _bundlrService.GetUploadFee(length);
+
+        //    return Json(new { length, path, fee });
+        //}
+
+        [Authorize]
+        public async Task<IActionResult> Upload(IFormFile file)
+        {
+            if (file is null || file.Length <= 0)
+                return Json(new { Success = false, Msg = "Select File" });
+
+            if (file.Length > 20000000L)
+                return Json(new { Success = false, Msg = "File size must under 20MB" });
+
+            var user = await _userService.GetUser(User.Identity.Name);
+
+            var fee = _bundlrService.GetUploadFee(file.Length);
+            if (user.Balance < fee)
+                return Json(new { Success = false, Msg = "Not enough balance" });
+
+            var extension = file.FileName[file.FileName.LastIndexOf(".")..];
+            var fileName = $"{user.UserId}-{Helper.GenerateRandomNumber(6)}{extension}";
+            var path = _hostEnvironment.ContentRootPath + $"\\UserFiles\\{fileName}";
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var fileInfo = new UserFile
+            {
+                UserId = user.UserId,
+                FileName = file.FileName,
+                Extension = extension,
+                IsUploaded = false,
+                ArweaveUrl = null,
+                Length = file.Length,
+                LocalName = fileName,
+                UploadTime = DateTime.UtcNow,
+            };
+            await _userFileService.Add(fileInfo);
+
+            var arweaveUrl = _bundlrService.UploadFile(path);
+            if (arweaveUrl is null)
+                return Json(new { Success = false, Msg = "upload to blockchain exeption" });
+
+            fileInfo.ArweaveUrl = arweaveUrl;
+            fileInfo.IsUploaded = true;
+            await _userFileService.Update(fileInfo);
+
+            user.Balance -= fee;
+            await _userService.Update(user);
+
+            return Json(fileInfo.ArweaveUrl);
+        }
+
+        public IActionResult GetFee(long length)
+        {
+            var fee = _bundlrService.GetUploadFee(length);
+
+            return Json(fee);
         }
 
         public async Task<IActionResult> Login(string address, string signature)
@@ -39,7 +128,11 @@ namespace BobaFileManager.Controllers
             if (publicAddress is null)
                 return Json(false);
 
-            var user = new User { Address = publicAddress };
+            var user = new User
+            {
+                Address = publicAddress,
+                Balance = 0.500000000000000000m,
+            };
             await _userService.TryAdd(user);
 
             var identity = new ClaimsIdentity(new[] {
@@ -54,6 +147,13 @@ namespace BobaFileManager.Controllers
             });
 
             return Json(true);
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Privacy()

@@ -4,7 +4,7 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <h1>Hello, user</h1>
+    <h1>Hello, @(User.Identity.Name)</h1>
     <form enctype="multipart/form-data" id="upload-form">
         <input name="file" type="file" />
         <button type="submit">Upload</button>
@@ -65,7 +65,7 @@ else
                     e.preventDefault();
                     var form = $(this);
                     $.ajax({
-                        url: 'https://localhost:5001/api/upload',
+                        url: 'https://localhost:5001/upload',
                         type: 'POST',
                         data: new FormData(form[0]),
                         cache: false,
