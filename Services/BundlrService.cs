@@ -42,6 +42,18 @@ namespace BobaFileManager.Services
             //return fee;
         }
 
+        public string Test(long fileSize)
+        {
+
+            var arg = "bundlr -v";
+
+            MakeProcess(arg);
+            var output = Execute();
+
+            return output;
+            //return fee;
+        }
+
         public string UploadFile(string filePath)
         {
             var arg = "bundlr " +
@@ -85,11 +97,11 @@ namespace BobaFileManager.Services
         private string Execute()
         {
             cmd.Start();
-            string output = cmd.StandardOutput.ReadToEnd();
             cmd.WaitForExit();
+            string output = cmd.StandardOutput.ReadToEnd();
+            Console.WriteLine(output);
             cmd.Close();
             cmd.Dispose();
-
             return output;
         }
     }
