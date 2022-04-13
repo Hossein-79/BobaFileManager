@@ -4,7 +4,7 @@
     @{
         var fileSize = (Model.Length / 1024) / 1024 > 0 ? (Model.Length / 1024) / 1024 + " MB" : (Model.Length / 1024) + " KB";
     }
-    @if(Model.Extension == "jpg" || Model.Extension == "png" || Model.Extension == "jpeg")
+    @if(Model.Extension == ".jpg" || Model.Extension == ".png" || Model.Extension == ".jpeg")
     {
         <img src="@(Model.ArweaveUrl)" class="w-full h-auto object-cover rounded-lg mb-3" />
     }

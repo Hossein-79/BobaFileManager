@@ -236,9 +236,11 @@
                 $('#file-container').append(response);
             })
             .fail(function(error) {
-                $('#upload-confirm-btn').removeAttr('disabled').removeClass('loading');
                 showAlert(error, 'error');
             })
+            .always(function() {
+                $('#upload-confirm-btn').removeAttr('disabled').removeClass('loading');
+            });
     });
 
     $(document).on('submit', '#text-upload', function(e) {
