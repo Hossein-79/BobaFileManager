@@ -96,6 +96,33 @@
         </form>
     </div>
 </div>
+<div class="modal" id="funding-modal">
+    <div class="modal-body">
+        <div class="modal-header">
+            <h2>Fund Account</h2>
+            <button type="button" class="btn-icon modal-close">
+                <svg role="img" class="h-5 w-5">
+                    <use xlink:href="/img/sprite.svg#icon-x"></use>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-content"></div>
+        <form action="" id="file-submit-form" class="flex flex-col mt-4">
+            <p class="text-sm text-gray-600 mb-4">
+                How much do you want to fund your account?(in Boba)
+            </p>
+            <input type="text" inputmode="decimal" class="input" id="funds-amount-input">
+            <button type="submit" id="confirm-funds-btn" class="btn mt-2">
+                <div class="loader">
+                    <svg role="img" class="animate-spin w-6 h-6">
+                        <use xlink:href="/img/sprite.svg#icon-loader"></use>
+                    </svg>
+                </div>
+                <span class="text">Confirm</span>
+            </button>
+        </form>
+    </div>
+</div>
 <div class="modal" id="alert-modal">
     <div class="modal-body">
         <div class="modal-header">
@@ -108,7 +135,7 @@
         </div>
         <div>
             <p class="error-txt text-sm text-gray-600 mb-3"></p>
-            <button type="submit" id="upload-confirm-btn" class="btn mt-2">
+            <button type="submit" class="modal-close btn mt-2">
                 Close
             </button>
         </div>
@@ -119,7 +146,10 @@
 <script src="~/web3/web3.min.js"></script>
 <script>
     const web3 = new window.Web3(window.ethereum);
-    $(document).on('click', '#add-funds-btn', function () {
+    $(document).on('click', '#add-funds-btn', function() {
+        showModal($('#funding-modal'));
+    });
+    $(document).on('click', '#confirm-funds-btn', function () {
         const abi = [{
             "constant": false,
             "inputs": [
@@ -144,12 +174,13 @@
         }];
         const contract_address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309';
         const addr = ethereum.selectedAddress;
-        const amount = web3.utils.toWei('0.1', 'ether');
+        const amount = web3.utils.toWei($('#funds-amount-input').val(), 'ether');
         const contract = new web3.eth.Contract(abi, contract_address).methods.transfer(addr, amount).send({
             from: addr,
             value: web3.utils.toWei('0', 'ether')
         })
             .then(function (receipt) {
+                $('#funds-amount-input').val('');
                 $.post('/fund', {
                     transactionHash: receipt.transactionHash,
                     amount: amount
