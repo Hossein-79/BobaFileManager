@@ -6,7 +6,7 @@
     }
     @if(Model.Extension == ".jpg" || Model.Extension == ".png" || Model.Extension == ".jpeg")
     {
-        <img src="@(Model.ArweaveUrl)" class="w-full h-auto object-cover rounded-lg mb-3" />
+        <img src="@(Model.ArweaveUrl)" class="w-full max-h-80 object-cover rounded-lg mb-3" />
     }
     <div class="flex">
         <div class="bg-sky-100 text-sky-500 flex items-center justify-center shrink-0 h-full rounded-lg p-4 aspect-square mr-3">

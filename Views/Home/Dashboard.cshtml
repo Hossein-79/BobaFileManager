@@ -15,7 +15,7 @@
         <small class="text-xs font-light text-emerald-600">Add Funds</small>
     </button>
 </header>
-<div class="overflow-y-auto flex flex-col">
+<div class="overflow-y-auto flex flex-col" id="scroll-wrapper">
     <section class="flex flex-col flex-grow bg-slate-100 pb-3" id="file-container">
         @if(Model.Any())
         {
@@ -239,6 +239,9 @@
                 $('#text-input').val('');
                 $('.empty-state').remove();
                 $('#file-container').append(response);
+                $('#scroll-wrapper').animate({
+                    scrollTop: $('#scroll-wrapper')[0].scrollHeight
+                }, 1000);
             })
             .fail(function(error) {
                 showAlert(error, 'error');
