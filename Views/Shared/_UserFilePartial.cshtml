@@ -1,1 +1,10 @@
 ﻿@model UserFile
+
+<div class="flex flex-col w-4/5 bg-white rounded-lg p-3 shadow mt-3">
+    @{
+        var fileSize = (Model.Length / 1024) / 1024 > 0 ? (Model.Length / 1024) / 1024 + " MB" : (Model.Length / 1024) + " KB";
+    }
+    <a href="@(Model.ArweaveUrl)">@(Model.FileName)</a>
+    <small class="">@(fileSize)</small>
+    <small>@(Model.UploadTime.ToString("MMM dd, yyyy"))</small>
+</div>

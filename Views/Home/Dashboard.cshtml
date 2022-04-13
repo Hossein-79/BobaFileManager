@@ -15,7 +15,7 @@
         <small class="text-xs font-light text-emerald-600">Add Funds</small>
     </button>
 </header>
-<section class="flex flex-col flex-grow bg-slate-100">
+<section class="flex flex-col flex-grow bg-slate-100" id="file-container">
     @if(Model.Any())
     {
         foreach (var file in Model)
@@ -34,19 +34,32 @@
                 file</span>
         </div>
     }
-    <progress></progress>
 </section>
 <footer class="flex bg-white shadow p-3">
     <label for="file-input" class="btn cursor-pointer mr-3">
-        <svg role="img" class="h-6 w-6">
-            <use xlink:href="/img/sprite.svg#icon-upload-cloud"></use>
-        </svg>
+        <div class="loader">
+            <svg role="img" class="animate-spin w-6 h-6">
+                <use xlink:href="/img/sprite.svg#icon-loader"></use>
+            </svg>
+        </div>
+        <span class="text">
+            <svg role="img" class="h-6 w-6">
+                <use xlink:href="/img/sprite.svg#icon-upload-cloud"></use>
+            </svg>
+        </span>
     </label>
     <form action="" class="flex-grow" id="text-upload">
         <div class="input-wrapper group m-0">
-            <input type="text" id="text-input" class="input pr-20" placeholder="Or write here to upload as .txt">
+            <input type="text" id="text-input" class="input pr-20" placeholder="Or write here to upload as .txt" autocomplete="off">
             <div class="input-icon invisible group-focus-within:visible">
-                <button class="btn btn-sm" type="submit">send</button>
+                <button class="btn btn-sm" type="submit">
+                    <div class="loader">
+                        <svg role="img" class="animate-spin w-6 h-6">
+                            <use xlink:href="/img/sprite.svg#icon-loader"></use>
+                        </svg>
+                    </div>
+                    <span class="text">send</span>
+                </button>
             </div>
         </div>
     </form>
@@ -79,6 +92,24 @@
                 <span class="text">Upload File</span>
             </button>
         </form>
+    </div>
+</div>
+<div class="modal" id="alert-modal">
+    <div class="modal-body">
+        <div class="modal-header">
+            <h2 class="status-txt"></h2>
+            <button type="button" class="btn-icon modal-close">
+                <svg role="img" class="h-5 w-5">
+                    <use xlink:href="/img/sprite.svg#icon-x"></use>
+                </svg>
+            </button>
+        </div>
+        <div>
+            <p class="error-txt text-sm text-gray-600 mb-3"></p>
+            <button type="submit" id="upload-confirm-btn" class="btn mt-2">
+                Close
+            </button>
+        </div>
     </div>
 </div>
 
@@ -117,10 +148,13 @@
             value: web3.utils.toWei('0', 'ether')
         })
             .then(function (receipt) {
-                console.log(receipt);
+                $.post('/fund', {
+                    transactionHash: receipt.transactionHash,
+                    amount: amount
+                })
             })
             .catch(function (error) {
-                console.log(error);
+                showAlert(error.message, 'error');
             });
     })
 
@@ -132,14 +166,17 @@
             showAlert('File size is too big', 'error');
             return;
         }
+        $('label[for="file-input"]').attr('disabled', 'disabled').addClass('loading');
         $.get('/GetFee?length=' + file.size)
             .done(function(response) {
-                console.log(response)
                 $('#file-size').text(response);
                 showModal($('#file-preview-modal'));
             })
             .fail(function(error) {
                 showAlert(error, 'error');
+            })
+            .always(function() {
+                $('label[for="file-input"]').removeAttr('disabled').removeClass('loading');
             });
     });
     $(document).on('submit', '#file-submit-form', function(e) {
@@ -158,31 +195,33 @@
             cache: false,
             contentType: false,
             processData: false,
-            xhr: function () {
-                var myXhr = $.ajaxSettings.xhr();
-                if (myXhr.upload) {
-                    myXhr.upload.addEventListener('progress', function (e) {
-                        if (e.lengthComputable) {
-                            $('progress').attr({
-                                value: e.loaded,
-                                max: e.total,
-                            });
-                        }
-                    }, false);
-                }
-                return myXhr;
-            }
         })
+            .done(function(response) {
+                hideModal($('#file-preview-modal'));
+                $('#upload-confirm-btn').removeAttr('disabled').removeClass('loading');
+                $('#text-input').val('');
+            })
+            .fail(function(error) {
+                showAlert(error, 'error');
+            })
     });
 
     $(document).on('submit', '#text-upload', function(e) {
         e.preventDefault();
-        var inputVal = $('#text-input').val();
-        var fileName = ''
+        const inputVal = $('#text-input').val();
+        const fileName = Date.now() + '.txt';
+        const formData = new FormData();
+        const file = new File([new Blob([inputVal])], fileName);
+        const container = new DataTransfer();
+        container.items.add(file);
+        $(':file')[0].files = container.files;
+        $(':file').trigger('change');
     });
 
     function showAlert(message, type) {
-        alert(message);
+        $('#alert-modal .status-txt').text(type == 'error' ? 'Error' : 'Success');
+        $('#alert-modal .error-txt').text(message);
+        showModal($('#alert-modal'));
     }
 </script>
 }
