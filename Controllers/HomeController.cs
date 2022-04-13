@@ -140,6 +140,12 @@ namespace BobaFileManager.Controllers
             return Json(fee);
         }
 
+        public IActionResult Test()
+        {
+            var t = _bundlrService.Test(10000);
+            return Content(t);
+        }
+
         public async Task<IActionResult> Login(string address, string signature)
         {
             if (User.Identity.IsAuthenticated)
