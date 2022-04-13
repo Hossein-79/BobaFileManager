@@ -1,6 +1,6 @@
 ﻿@model UserFile
 
-<a href="@(Model.ArweaveUrl)" class="flex flex-col w-4/5 lg:w-2/5 bg-white rounded-lg p-3 shadow mt-3 ml-3">
+<a href="@(Model.ArweaveUrl)" class="flex flex-col relative w-4/5 lg:w-2/5 bg-white rounded-lg p-3 shadow mt-3 ml-3">
     @{
         var fileSize = (Model.Length / 1024) / 1024 > 0 ? (Model.Length / 1024) / 1024 + " MB" : (Model.Length / 1024) + " KB";
     }
@@ -13,4 +13,9 @@
         <small class="">@(fileSize)</small>
         <small>@(Model.UploadTime.ToString("MMM dd, yyyy"))</small>
     </div>
+    <button class="share-btn group absolute left-full bottom-0 bg-white rounded-full transition-all hover:shadow active:shadow-none active:bg-gray-200 ml-3 p-2" data-url="@(Model.ArweaveUrl)" data-text="@(Model.FileName)">
+        <svg role="img" class="h-5 w-5 text-gray-400 relative transition-colors group-hover:text-gray-600 right-px">
+            <use xlink:href="/img/sprite.svg#icon-share-2"></use>
+        </svg>
+    </button>
 </a>
