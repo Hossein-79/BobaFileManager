@@ -175,6 +175,7 @@
         const contract_address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309';
         const addr = ethereum.selectedAddress;
         const amount = web3.utils.toWei($('#funds-amount-input').val(), 'ether');
+        var amountToSend = $('#funds-amount-input').val();
         const contract = new web3.eth.Contract(abi, contract_address).methods.transfer(addr, amount).send({
             from: addr,
             value: web3.utils.toWei('0', 'ether')
@@ -183,7 +184,7 @@
                 $('#funds-amount-input').val('');
                 $.post('/fund', {
                     txid: receipt.transactionHash,
-                    amount: $('#funds-amount-input').val()
+                    amount: amountToSend
                 })
                     .done(function (data) {
                         if (data == true) {
