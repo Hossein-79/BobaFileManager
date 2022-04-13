@@ -70,20 +70,19 @@ namespace BobaFileManager.Controllers
         [Authorize]
         public async Task<IActionResult> Upload(IFormFile file)
         {
-            var rrr = new UserFile
-            {
-                UserFileId = 1,
-                UserId = 1,
-                FileName = "ticket_1037149696.pdf",
-                Extension = ".pdf",
-                Length = 162593,
-                LocalName = "1-839598.pdf",
-                ArweaveUrl = "https://arweave.net/4mcsgP3kVbT-0I4UEhwmE6F3OJ2wNryhWYHWQP5-Z2w",
-                IsUploaded = true,
-                UploadTime = DateTime.UtcNow,
-            };
-            return PartialView("_UserFilePartial", rrr);
-
+            //var rrr = new UserFile
+            //{
+            //    UserFileId = 1,
+            //    UserId = 1,
+            //    FileName = "ticket_1037149696.pdf",
+            //    Extension = ".pdf",
+            //    Length = 162593,
+            //    LocalName = "1-839598.pdf",
+            //    ArweaveUrl = "https://arweave.net/4mcsgP3kVbT-0I4UEhwmE6F3OJ2wNryhWYHWQP5-Z2w",
+            //    IsUploaded = true,
+            //    UploadTime = DateTime.UtcNow,
+            //};
+            //return PartialView("_UserFilePartial", rrr);
 
             if (file is null || file.Length <= 0)
                 return Json(new { Success = false, Msg = "Select File" });
@@ -136,8 +135,8 @@ namespace BobaFileManager.Controllers
 
         public IActionResult GetFee(long length)
         {
-            //var fee = _bundlrService.GetUploadFee(length);
-            var fee = 0.000089631437673069m;
+            var fee = _bundlrService.GetUploadFee(length);
+            //var fee = 0.000089631437673069m;
             return Json(fee);
         }
 
