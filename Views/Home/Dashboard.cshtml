@@ -182,9 +182,14 @@
             .then(function (receipt) {
                 $('#funds-amount-input').val('');
                 $.post('/fund', {
-                    transactionHash: receipt.transactionHash,
-                    amount: amount
+                    txid: receipt.transactionHash,
+                    amount: $('#funds-amount-input').val()
                 })
+                    .done(function (data) {
+                        if (data == true) {
+                            location.reload();
+                        }
+                    })
             })
             .catch(function (error) {
                 showAlert(error.message, 'error');

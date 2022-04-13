@@ -9,7 +9,7 @@
         <img src="@(Model.ArweaveUrl)" class="w-full h-auto object-cover rounded-lg mb-3" />
     }
     <div class="flex">
-        <div class="bg-sky-100 text-sky-500 flex items-center justify-center shrink-0 h-full rounded-lg p-4 mr-3">
+        <div class="bg-sky-100 text-sky-500 flex items-center justify-center shrink-0 h-full rounded-lg p-4 aspect-square mr-3">
             @if (Model.Extension.ToUpper() == ".JPG" || Model.Extension.ToUpper() == ".JPEG" || Model.Extension.ToUpper() == ".PNG" || Model.Extension.ToUpper() == ".GIF")
             {
                 <svg role="img" class="h-7 w-7">
@@ -42,7 +42,7 @@
             }
         </div>
         <div class="flex flex-col w-full">
-            <span class="text-sky-600">@(Model.FileName)</span>
+            <span class="text-sky-600 break-all">@(Model.FileName)</span>
             <div class="flex justify-between text-gray-400 text-sm mt-3">
                 <small class="">@(fileSize)</small>
                 <small>@(Model.UploadTime.ToString("MMM dd, yyyy"))</small>
