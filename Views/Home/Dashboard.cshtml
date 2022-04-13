@@ -191,7 +191,7 @@
         e.preventDefault();
         var form = $(this);
         $.ajax({
-            url: 'https://localhost:5001/upload',
+            url: '/upload',
             type: 'POST',
             data: new FormData(form[0]),
             cache: false,
