@@ -1,10 +1,16 @@
 ﻿@model UserFile
 
-<div class="flex flex-col w-4/5 bg-white rounded-lg p-3 shadow mt-3">
+<a href="@(Model.ArweaveUrl)" class="flex flex-col w-4/5 lg:w-2/5 bg-white rounded-lg p-3 shadow mt-3 ml-3">
     @{
         var fileSize = (Model.Length / 1024) / 1024 > 0 ? (Model.Length / 1024) / 1024 + " MB" : (Model.Length / 1024) + " KB";
     }
-    <a href="@(Model.ArweaveUrl)">@(Model.FileName)</a>
-    <small class="">@(fileSize)</small>
-    <small>@(Model.UploadTime.ToString("MMM dd, yyyy"))</small>
-</div>
+    @if(Model.Extension == "jpg" || Model.Extension == "png" || Model.Extension == "jpeg")
+    {
+        <img src="@(Model.ArweaveUrl)" class="w-full h-auto object-cover rounded-lg" />
+    }
+    <span class="text-sky-600">@(Model.FileName)</span>
+    <div class="flex justify-between text-gray-400 text-sm mt-3">
+        <small class="">@(fileSize)</small>
+        <small>@(Model.UploadTime.ToString("MMM dd, yyyy"))</small>
+    </div>
+</a>

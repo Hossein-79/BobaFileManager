@@ -6,7 +6,7 @@
 <header class="flex items-center bg-white shadow p-3">
     <img src="https://source.boringavatars.com/marble/120/0x05E4193Db127fC3Ed080B85c37e0F4eC8fCAd8fD?colors=264653,2a9d8f,e9c46a,f4a261,e76f51"
         class="w-10 h-10 mr-3" alt="">
-    <a href="#" class="flex flex-col">
+    <a href="/logout" class="flex flex-col">
         <span class="text-sm font-bold mb-1">0x05E4...d8fD</span>
         <small class="text-xs font-light text-slate-500">Disconnect</small>
     </a>
@@ -15,26 +15,28 @@
         <small class="text-xs font-light text-emerald-600">Add Funds</small>
     </button>
 </header>
-<section class="flex flex-col flex-grow bg-slate-100" id="file-container">
-    @if(Model.Any())
-    {
-        foreach (var file in Model)
+<div class="overflow-y-auto flex flex-col">
+    <section class="flex flex-col flex-grow bg-slate-100 pb-3" id="file-container">
+        @if(Model.Any())
         {
-            @await Html.PartialAsync("~/Views/Shared/_UserFilePartial.cshtml", file);
+            foreach (var file in Model)
+            {
+                @await Html.PartialAsync("~/Views/Shared/_UserFilePartial.cshtml", file);
+            }
         }
-    }
-    else
-    {
-        <div class="empty-state flex flex-col items-center text-center m-auto max-w-min">
-            <svg role="img" class="h-64 w-64 mx-5">
-                <use xlink:href="/img/sprite.svg#illustration-empty"></use>
-            </svg>
-            <h2 class="font-medium text-lg mb-2">This place looks empty!</h2>
-            <span class="font-light text-sm text-slate-500">Upload a file or send a message and have it stored as a .txt
-                file</span>
-        </div>
-    }
-</section>
+        else
+        {
+            <div class="empty-state flex flex-col items-center text-center m-auto max-w-min">
+                <svg role="img" class="h-64 w-64 mx-5">
+                    <use xlink:href="/img/sprite.svg#illustration-empty"></use>
+                </svg>
+                <h2 class="font-medium text-lg mb-2">This place looks empty!</h2>
+                <span class="font-light text-sm text-slate-500">Upload a file or send a message and have it stored as a .txt
+                    file</span>
+            </div>
+        }
+    </section>
+</div>
 <footer class="flex bg-white shadow p-3">
     <label for="file-input" class="btn cursor-pointer mr-3">
         <div class="loader">
