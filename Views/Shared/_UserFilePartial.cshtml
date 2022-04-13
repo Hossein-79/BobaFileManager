@@ -10,25 +10,25 @@
     }
     <div class="flex">
         <div class="bg-sky-100 text-sky-500 flex items-center justify-center shrink-0 h-full rounded-lg p-4 mr-3">
-            @if (Model.Extension.ToUpper() == "JPG" || Model.Extension.ToUpper() == "JPEG" || Model.Extension.ToUpper() == "PNG" || Model.Extension.ToUpper() == "GIF")
+            @if (Model.Extension.ToUpper() == ".JPG" || Model.Extension.ToUpper() == ".JPEG" || Model.Extension.ToUpper() == ".PNG" || Model.Extension.ToUpper() == ".GIF")
             {
                 <svg role="img" class="h-7 w-7">
                     <use xlink:href="/img/sprite.svg#icon-image"></use>
                 </svg>
             }
-            else if (Model.Extension.ToUpper() == "MP3" || Model.Extension.ToUpper() == "WAV" || Model.Extension.ToUpper() == "OGG")
+            else if (Model.Extension.ToUpper() == ".MP3" || Model.Extension.ToUpper() == ".WAV" || Model.Extension.ToUpper() == ".OGG")
             {
                 <svg role="img" class="h-7 w-7">
                     <use xlink:href="/img/sprite.svg#icon-music"></use>
                 </svg>
             }
-            else if (Model.Extension.ToUpper() == "MP4" || Model.Extension.ToUpper() == "AVI" || Model.Extension.ToUpper() == "MOV" || Model.Extension.ToUpper() == "MPG" || Model.Extension.ToUpper() == "FLV" || Model.Extension.ToUpper() == "MKV" || Model.Extension.ToUpper() == "WEBM")
+            else if (Model.Extension.ToUpper() == ".MP4" || Model.Extension.ToUpper() == ".AVI" || Model.Extension.ToUpper() == ".MOV" || Model.Extension.ToUpper() == ".MPG" || Model.Extension.ToUpper() == ".FLV" || Model.Extension.ToUpper() == ".MKV" || Model.Extension.ToUpper() == ".WEBM")
             {
                 <svg role="img" class="h-7 w-7">
                     <use xlink:href="/img/sprite.svg#icon-video"></use>
                 </svg>
             }
-            else if (Model.Extension.ToUpper() == "TXT" || Model.Extension.ToUpper() == "PDF" || Model.Extension.ToUpper() == "DOCX")
+            else if (Model.Extension.ToUpper() == ".TXT" || Model.Extension.ToUpper() == ".PDF" || Model.Extension.ToUpper() == ".DOCX")
             {
                 <svg role="img" class="h-7 w-7">
                     <use xlink:href="/img/sprite.svg#icon-file-text"></use>
