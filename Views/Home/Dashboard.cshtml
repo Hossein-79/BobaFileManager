@@ -200,12 +200,12 @@
         })
             .done(function(response) {
                 hideModal($('#file-preview-modal'));
-                $('#upload-confirm-btn').removeAttr('disabled').removeClass('loading');
                 $('#text-input').val('');
                 $('.empty-state').remove();
                 $('#file-container').append(response);
             })
             .fail(function(error) {
+                $('#upload-confirm-btn').removeAttr('disabled').removeClass('loading');
                 showAlert(error, 'error');
             })
     });

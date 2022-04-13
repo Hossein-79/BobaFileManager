@@ -22,19 +22,19 @@ $(document).on('click', '.modal', function(e) {
     hideModal($(this));
 });
 // SHARE BUTTON
-if (navigator.share) {
-    $(document).on('click', '.share-btn', function(e) {
-        e.preventDefault();
-        console.log('s')
-        var url = $(this).attr('data-url');
-        var text = $(this).attr('data-text');
-        // CHECK FOR NAVIGATOR SHARE
-        navigator.share({
-            title: text,
-            url: url
-        });
-    });
-} else {
-    // REMOVE SHARE BUTTON
-    $('.share-btn').remove();
-}
+// if (navigator.share) {
+//     $(document).on('click', '.share-btn', function(e) {
+//         e.preventDefault();
+//         console.log('s')
+//         var url = $(this).attr('data-url');
+//         var text = $(this).attr('data-text');
+//         // CHECK FOR NAVIGATOR SHARE
+//         navigator.share({
+//             title: text,
+//             url: url
+//         });
+//     });
+// } else {
+//     // REMOVE SHARE BUTTON
+//     $('.share-btn').remove();
+// }
